@@ -14,6 +14,10 @@ async def on_ready():
         status=discord.Status.dnd,
         activity=discord.Game("VirtuBot")
     )
+    for extension in os.listdir('./cogs'):
+        if extension.endswith('.py'):
+            await bot.load_extension(f'cogs.{extension[:-3]}')
+            print(f'Le module cogs.{extension[:-3]} a été chargé.')
     try:
         synced = await bot.tree.sync()
         print(f"{len(synced)} Commandes ont été chargées.")
@@ -37,45 +41,6 @@ async def help(interaction: discord.Interaction):
 async def hello(interaction: discord.Interaction):
     latency_ms = round(bot.latency * 1000)
     await interaction.response.send_message(f"Hello 😊 latence: {latency_ms} ms", ephemeral=True)
-
-# Groupe de commandes admin
-group = discord.app_commands.Group(name="admin", description="Commandes admin")
-
-@group.command(name="kick", description="Expulse un membre")
-async def kick(interaction: discord.Interaction, member: discord.Member):
-    if not interaction.user.guild_permissions.kick_members:
-        await interaction.response.send_message(
-            "❌ Tu n'as pas la permission d'expulser des membres.",
-            ephemeral=True
-        )
-        return
-
-    try:
-        await member.kick(reason=f"Expulsé par {interaction.user}")
-        await interaction.response.send_message(f"{member.mention} a été expulsé ✅")
-        print(f"{member} a été expulsé par {interaction.user}")
-    except Exception as e:
-        await interaction.response.send_message(f"Erreur lors de l'expulsion: {e}")
-
-@group.command(name="ban", description="Bannit un membre")
-async def ban(interaction: discord.Interaction, member: discord.Member):
-    if not interaction.user.guild_permissions.ban_members:
-        await interaction.response.send_message(
-            "❌ Tu n'as pas la permission de bannir des membres.",
-            ephemeral=True
-        )
-        return
-
-    try:
-        await member.ban(reason=f"Banni par {interaction.user}")
-        await interaction.response.send_message(f"{member.mention} a été banni ✅")
-        print(f"{member} a été banni par {interaction.user}")
-    except Exception as e:
-        await interaction.response.send_message(f"Erreur lors du bannissement: {e}")
-
-bot.tree.add_command(group)
-
-
 
 
 BOT = os.getenv("DISCORD_TOKEN")
