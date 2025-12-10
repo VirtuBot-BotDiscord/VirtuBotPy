@@ -1,15 +1,20 @@
 import discord
 import os
+import time
 from discord.ext import commands
 
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+print("Démarrage du bot...")
+
 #Événement lorsque le bot est prêt
 @bot.event
 async def on_ready():
     print(f'Votre bot {bot.user} est ONLINE.')
+    print('||-- VirtuBot --||')
+    time.sleep(2)
     await bot.change_presence(
         status=discord.Status.dnd,
         activity=discord.Game("VirtuBot")
@@ -42,8 +47,6 @@ async def hello(interaction: discord.Interaction):
     latency_ms = round(bot.latency * 1000)
     await interaction.response.send_message(f"Hello 😊 latence: {latency_ms} ms", ephemeral=True)
 
-
 BOT = os.getenv("DISCORD_TOKEN")
 bot.run(BOT)
-
 
