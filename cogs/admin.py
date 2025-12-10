@@ -5,13 +5,9 @@ class Admin(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        self.group = discord.app_commands.Group(
-            name="admin",
-            description="Commandes admin"
-        )
 
         # On ajoute les commandes au groupe
-        @self.group.command(name="kick", description="Expulse un membre")
+        @bot.tree.command(name="kick", description="Expulse un membre")
         async def kick(interaction: discord.Interaction, member: discord.Member):
             if not interaction.user.guild_permissions.kick_members:
                 await interaction.response.send_message(
@@ -27,7 +23,7 @@ class Admin(commands.Cog):
             except Exception as e:
                 await interaction.response.send_message(f"Erreur lors de l'expulsion: {e}")
 
-        @self.group.command(name="ban", description="Bannit un membre")
+        @bot.tree.command(name="ban", description="Bannit un membre")
         async def ban(interaction: discord.Interaction, member: discord.Member):
             if not interaction.user.guild_permissions.ban_members:
                 await interaction.response.send_message(
@@ -43,7 +39,6 @@ class Admin(commands.Cog):
             except Exception as e:
                 await interaction.response.send_message(f"Erreur lors du bannissement: {e}")
 
-        bot.tree.add_command(self.group)
 
 
 async def setup(bot: commands.Bot):
