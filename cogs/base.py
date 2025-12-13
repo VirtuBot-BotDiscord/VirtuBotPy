@@ -4,14 +4,16 @@ import time
 import json
 from discord.ext import commands
 
+bot = None
 
 class Base(commands.Cog):
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        @self.bot.tree.command(name="help", description="Affiche la liste des commandes disponibles.")
+    def __init__(self, bot_instance: commands.Bot):
+        global bot
+        bot = bot_instance
+        self.bot = bot_instance
+        
+        # Enregistrer les commandes dans le constructeur
+        @bot.tree.command(name="help", description="Affiche la liste des commandes disponibles.")
         async def help(interaction: discord.Interaction):
             embed = discord.Embed(
                 title="VirtuBot",
@@ -22,7 +24,7 @@ class Base(commands.Cog):
             embed.add_field(name="/hello", value="Dis bonjour au bot", inline=True)
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
-        @self.bot.tree.command(name="hello", description="Dis bonjour au bot")
+        @bot.tree.command(name="hello", description="Dis bonjour au bot")
         async def hello(interaction: discord.Interaction):
             latency_ms = round(self.bot.latency * 1000)
             await interaction.response.send_message(f"Hello 😊 latence: {latency_ms} ms", ephemeral=True)
