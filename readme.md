@@ -20,3 +20,7 @@ En utilisant ce projet, vous acceptez l’entière responsabilité de son usage.
    cd VirtuBot
    ```
    ....
+
+## 🎛️ Contributeurs
+
+### Falous-dev
