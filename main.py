@@ -143,7 +143,8 @@ async def load_extensions():
     for extension in os.listdir('./cogs'):
         if extension.endswith('.py'):
             await bot.load_extension(f'cogs.{extension[:-3]}')
-            print(f'Le module cogs.{extension[:-3]} a été chargé.')
+            if os.getenv("DEBUG_MODE").lower() == "true":
+                print(f'Le module cogs.{extension[:-3]} a été chargé.')
 
 @bot.event
 async def on_ready():
@@ -165,10 +166,40 @@ async def on_ready():
     """)
     time.sleep(5)
     print(f"{bot.user} est dans {len(bot.guilds)} serveurs.")
-    await bot.change_presence(
-        status=discord.Status.dnd,
-        activity=discord.Game("VirtuBot | Semi open Source Bot")
-    )
+    
+    bot_status = os.getenv("BOT_STATUS", "idle").lower()
+    activity_type = os.getenv("BOT_ACTIVITY_TYPE", "game").lower()
+    streaming_enabled = os.getenv("BOT_STREAMING_ENABLED", "false").lower() == "true"
+    streaming_url = os.getenv("BOT_STREAMING_URL", "").strip()
+    bot_activity_text = os.getenv("BOT_ACTIVITY", "VirtuBot")
+    
+    # Vérifier que l'URL est valide si le streaming est activé
+    if streaming_enabled and (not streaming_url or streaming_url.endswith('/')):
+        print(" URL de streaming invalide, streaming désactivé")
+        streaming_enabled = False
+    
+    status_map = {
+        "online": discord.Status.online,
+        "idle": discord.Status.idle,
+        "dnd": discord.Status.dnd,
+        "invisible": discord.Status.invisible
+    }
+    status = status_map.get(bot_status, discord.Status.idle)
+    
+    activity = None
+    if streaming_enabled and streaming_url:
+        activity = discord.Streaming(name=bot_activity_text, url=streaming_url)
+    elif activity_type == "streaming" and streaming_url:
+        activity = discord.Streaming(name=bot_activity_text, url=streaming_url)
+    elif activity_type == "watching":
+        activity = discord.Activity(type=discord.ActivityType.watching, name=bot_activity_text)
+    elif activity_type == "listening":
+        activity = discord.Activity(type=discord.ActivityType.listening, name=bot_activity_text)
+    else: 
+        activity = discord.Game(name=bot_activity_text)
+    
+    await bot.change_presence(status=status, activity=activity)
+    print(f" Statut: {bot_status} | Activité: {activity_type}" + (" | Streaming activé" if streaming_enabled else ""))
     
     try:
         await check_github_updates()

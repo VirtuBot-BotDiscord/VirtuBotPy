@@ -3,6 +3,7 @@ import os
 import json
 import random
 import asyncio
+from datetime import timedelta
 from discord.ext import commands
 
 bot = None
@@ -45,7 +46,7 @@ class Games(commands.Cog):
             if chambre == 1:
                 rd_timeout = random.randint(5,60)
                 await interaction.response.send_message(f"💥 Bang! {interaction.user.mention}, vous avez perdu la roulette russe! Tu te prends donc un mute de %s minutes :)"%rd_timeout)
-                membres.timeout(discord.utils.utcnow() + timedelta(minutes=rd_timeout), reason=f"A perdu à la roulette Russe (skill issue)")
+                await interaction.user.timeout(timedelta(minutes=rd_timeout), reason=f"A perdu à la roulette Russe (skill issue)")
             else:
                 await interaction.response.send_message(f"😅 Click! {interaction.user.mention}, vous êtes sauf cette fois-ci!")
             print(f"{interaction.user} a joué à la roulette russe et le résultat de la chambre est {chambre}")

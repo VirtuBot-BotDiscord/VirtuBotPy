@@ -1,7 +1,4 @@
 import discord
-import os
-import time
-import json
 from discord.ext import commands
 
 bot = None
