@@ -123,6 +123,8 @@ pip install -r requirements.txt
 # 2. Créer le fichier .env
 echo DISCORD_TOKEN=votre_token_ici > .env
 
+# 3. Optionnel (Site Web) si vous voulez faire le système de panel admin
+
 # 3. Lancer le bot
 python main.py
 ```
@@ -141,6 +143,15 @@ python main.py
 - ✅ Server Members Intent
 - ✅ Message Content Intent
 
+---
+
+### Configuration du Site web
+
+1. Allez sur le [Discord Developer Portal](https://discord.com/developers/applications)
+2. Allez sur votre bot que vous avez créé
+3. Allez dans l'onglet **OAuth2**
+4. Ajouter un Redirect puis mettre votre IP/Nom De Domaine:3001/api/auth/callback
+5. Puis, Save Change
 ---
 
 ## 🎯 Commandes
