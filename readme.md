@@ -449,7 +449,7 @@ Les contributions sont les bienvenues ! Voici comment vous pouvez aider :
 
 **[Falous-dev](https://github.com/Falous-dev)**
 
-**[HDM](https://github.com/HdmDEV)**
+
 
 ### 💡 Remerciements spéciaux
 
