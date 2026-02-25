@@ -46,7 +46,7 @@ Le créateur ne peut être tenu responsable de tout dommage lié à l’utilisat
 
 ---
 
-# VirtuBot License – Version 1.4 (English Version)
+# VirtuBot License – Version 1.0 (English Version)
 
 ## 1. Preamble
 VirtuBot is an open-source software created by **Falous-dev (falous344)**.  
