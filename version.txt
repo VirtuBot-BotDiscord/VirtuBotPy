@@ -1,0 +1,4 @@
+# Ne pas modifier ce fichier ! Le bot est uniquement disponible sur github.
+
+Version=V1.1.3
+

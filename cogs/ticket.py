@@ -6,7 +6,6 @@ import os
 import asyncio
 from datetime import datetime
 
-#Systeme de tickets.
 TICKET_CONFIG_FILE = "config/ticket_config.json"
 TICKET_DATA_FILE = "config/ticket_data.json"
 
@@ -269,7 +268,16 @@ class TicketModal(discord.ui.Modal):
             guild_tickets = get_guild_tickets(interaction.guild.id)
             
             category_id = guild_config.get('ticket_category')
-            category = interaction.guild.get_channel(category_id)
+            category = None
+            if category_id:
+                category = interaction.guild.get_channel(int(category_id))
+            
+            if not category:
+                try:
+                    await interaction.followup.send("❌ Erreur : La catégorie des tickets n'est pas configurée correctement. Contactez un administrateur.", ephemeral=True)
+                except:
+                    pass
+                return
 
             user = interaction.user
             channel_name = f"ticket-{user.display_name.lower()}"

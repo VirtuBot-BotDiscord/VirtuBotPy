@@ -20,6 +20,8 @@ _Fait par [Falous-dev](https://github.com/Falous-dev) _
 
 </div>
 
+# Ce readme Changera tres bientot !
+
 ## 📋 Description
 
 **VirtuBot** est un bot Discord complet et personnalisable écrit en Python, conçu pour enrichir votre serveur avec des fonctionnalités de modération, de divertissement, et bien plus encore.
@@ -99,13 +101,31 @@ L'auteur ne peut être tenu responsable des dommages, pertes de données, erreur
 git clone https://github.com/Falous-dev/VirtuBot.git
 cd VirtuBot
 
-# 2. Installer les dépendances
+# 2. Exécuter le script d'installation
+# Windows:
+install.bat
+
+# Linux/Mac:
+chmod +x install.sh
+./install.sh
+
+# 3. Le bot démarre automatiquement après l'installation
+```
+
+**pas encore config!**
+
+### Installation manuelle
+
+```bash
+# 1. Installer les dépendances
 pip install -r requirements.txt
 
-# 3. Créer le fichier .env
+# 2. Créer le fichier .env
 echo DISCORD_TOKEN=votre_token_ici > .env
 
-# 4. Lancer le bot
+# 3. Optionnel (Site Web) si vous voulez faire le système de panel admin
+
+# 3. Lancer le bot
 python main.py
 ```
 
@@ -123,6 +143,15 @@ python main.py
 - ✅ Server Members Intent
 - ✅ Message Content Intent
 
+---
+
+### Configuration du Site web
+
+1. Allez sur le [Discord Developer Portal](https://discord.com/developers/applications)
+2. Allez sur votre bot que vous avez créé
+3. Allez dans l'onglet **OAuth2**
+4. Ajouter un Redirect puis mettre votre IP/Nom De Domaine:3001/api/auth/callback
+5. Puis, Save Change
 ---
 
 ## 🎯 Commandes
@@ -188,6 +217,15 @@ VirtuBot/
 │   ├── ticket_data.json   # Données des tickets par serveur
 │   ├── blacklist.json     # Liste des utilisateurs blacklistés par serveur
 │   └── meme.json          # URLs des memes pour la commande /jeux-meme
+├── api/                   # API Flask pour le panel
+│   └── main.py           # Endpoints REST
+├── panel/                 # Panel d'administration web
+│   ├── index.html        # Page principale
+│   ├── css/
+│   │   └── style.css     # Styles
+│   └── js/
+│       ├── api.js        # Client API
+│       └── app.js        # Logique application
 ├── cogs/                  # Modules du bot
 │   ├── admin.py          # Commandes de modération + blacklist
 │   ├── base.py           # Commandes de base
@@ -195,9 +233,6 @@ VirtuBot/
 │   ├── ticket.py         # Système de tickets
 │   └── tool.py           # Utilitaires
 ├── requirements.txt       # Dépendances Python
-├── install.bat            # Script d'installation Windows
-├── install.ps1            # Script d'installation PowerShell
-├── install.sh             # Script d'installation Linux/Mac
 └── .env                  # Variables d'environnement (TOKEN)
 ```
 
@@ -218,7 +253,118 @@ Chaque serveur a sa propre configuration stockée avec son ID :
 
 ---
 
-## 🎨 Personnalisation
+## � Panel d'Administration Web
+
+VirtuBot dispose d'un panel web moderne pour gérer le bot à distance.
+
+### 🚀 Démarrage du Panel
+
+Le panel est une application web Flask accessible via navigateur :
+
+```bash
+# Lancer le panel (port 3001 par défaut)
+python api/main.py
+```
+
+Accédez ensuite au panel via : **http://localhost:3001**
+
+### ✨ Fonctionnalités du Panel
+
+#### 📊 Tableau de Bord Principal (`index.html`)
+
+- **Statistiques en temps réel** : Nombre de serveurs, utilisateurs, commandes exécutées
+- **État du bot** : Latence, uptime, version
+- **Graphiques** : Utilisation des commandes, activité par serveur
+- **Actions rapides** : Redémarrage, synchronisation des commandes
+
+#### 🔐 Authentification (`login.html`)
+
+- Connexion sécurisée avec identifiant Discord
+- Sessions persistantes
+- Protection contre les accès non autorisés
+
+#### 🖥️ Gestion des Serveurs (`serveur.html`)
+
+- Liste de tous les serveurs où le bot est présent
+- Configuration par serveur :
+  - Système de tickets
+  - Rôles de support
+  - Catégories et canaux
+  - Blacklist locale
+- Statistiques détaillées par serveur
+
+#### ⚠️ Logs et Erreurs (`errors.html`)
+
+- **Logs des Commandes** : Historique complet avec filtres
+- **Erreurs Récentes** : Codes d'erreur avec contexte
+- **Documentation** : Guide de résolution intégré
+- **Export** : Téléchargement des logs en JSON/CSV
+
+### 🔧 Configuration de l'API
+
+L'API Flask utilise les endpoints suivants :
+
+| Endpoint                   | Méthode | Description                          |
+| -------------------------- | ------- | ------------------------------------ |
+| `/api/stats`               | GET     | Récupère les statistiques globales   |
+| `/api/servers`             | GET     | Liste tous les serveurs              |
+| `/api/servers/<id>`        | GET     | Détails d'un serveur spécifique      |
+| `/api/servers/<id>/config` | PUT     | Met à jour la configuration          |
+| `/api/blacklist`           | GET     | Liste des utilisateurs blacklistés   |
+| `/api/blacklist/<id>`      | POST    | Ajoute un utilisateur à la blacklist |
+| `/api/logs`                | GET     | Récupère les logs avec filtres       |
+| `/api/commands/sync`       | POST    | Synchronise les commandes slash      |
+
+### 🛠️ Développement du Panel
+
+**Structure des fichiers :**
+
+```
+panel/
+├── index.html          # Tableau de bord principal
+├── login.html          # Page de connexion
+├── serveur.html        # Gestion des serveurs
+├── errors.html         # Logs et erreurs
+├── css/
+│   └── style.css      # Styles globaux (design moderne)
+└── js/
+    ├── api.js         # Client API (fetch, auth)
+    └── app.js         # Logique application (interactivité)
+    └── serveur.js     # Gestion serveurs (filtres, édition)
+```
+
+**Technologies utilisées :**
+
+- **Backend** : Flask (Python) avec CORS
+- **Frontend** : HTML5, CSS3, JavaScript vanilla
+- **Design** : Interface moderne avec thème sombre/clair
+- **API** : REST avec JSON
+
+### 🔒 Sécurité
+
+- ⚠️ **Par défaut** : Le panel est accessible localement uniquement (`localhost:3001`)
+- 🌐 **Production** : Configurez un reverse proxy (Nginx) avec HTTPS
+- 🔑 **Authentification** : Implémentez OAuth2 Discord pour sécuriser l'accès
+- 🛡️ **CORS** : Configurez les origines autorisées dans `api/main.py`
+
+### 📝 Exemple de Configuration
+
+```python
+# api/main.py
+from flask import Flask
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)  # À configurer pour la production
+
+# Port personnalisé
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=3001, debug=True)
+```
+
+---
+
+## �🎨 Personnalisation
 
 ### Ajouter un nouveau module (Cog)
 
@@ -244,6 +390,35 @@ async def setup(bot: commands.Bot):
 ```
 
 Le bot chargera automatiquement tous les fichiers `.py` du dossier `cogs/`.
+
+---
+
+## 🐛 Codes d'Erreur
+
+VirtuBot utilise un système de codes d'erreur pour faciliter le débogage. Voici la liste complète :
+
+### Codes d'Erreur Disponibles
+
+| Code                  | Description               | Gravité          | Solution                                                                                                          |
+| --------------------- | ------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **ERR_PERMS**         | Permissions Insuffisantes | 🔴 Critique      | L'utilisateur ou le bot n'a pas les permissions nécessaires. Vérifiez les rôles et permissions du serveur.        |
+| **ERR_ARGS**          | Argument Manquant         | 🟡 Avertissement | Une ou plusieurs valeurs requises n'ont pas été fournies. Consultez la documentation de la commande avec `/help`. |
+| **ERR_CMD_NOT_FOUND** | Commande Introuvable      | 🔵 Info          | La commande demandée n'existe pas. Utilisez `/help` pour voir les commandes disponibles.                          |
+| **ERR_COOLDOWN**      | Cooldown Actif            | 🟡 Avertissement | La commande a un temps de recharge. Attendez quelques secondes avant de réutiliser.                               |
+| **ERR_UNKNOWN**       | Erreur Inconnue           | 🔴 Critique      | Erreur inattendue. Vérifiez les logs du bot pour plus de détails.                                                 |
+| **ERR_API**           | Erreur API                | 🔴 Critique      | Impossible de communiquer avec l'API externe. Vérifiez la connexion internet et la configuration.                 |
+| **ERR_DB**            | Erreur Base de Données    | 🔴 Critique      | Impossible d'accéder ou modifier les données. Vérifiez les fichiers de configuration JSON.                        |
+| **ERR_TIMEOUT**       | Timeout                   | 🟡 Avertissement | L'opération a pris trop de temps et a été annulée. Réessayez plus tard.                                           |
+
+### Logs et Monitoring
+
+Le panel d'administration propose une page dédiée aux logs et erreurs :
+
+- **Logs des Commandes** : Historique détaillé de toutes les commandes exécutées avec leurs paramètres
+- **Erreurs Récentes** : Liste des erreurs avec codes, timestamps et contexte
+- **Documentation** : Guide de résolution pour chaque code d'erreur
+
+Accédez au panel via : `http://localhost:3001/errors.html`
 
 ---
 
@@ -274,12 +449,14 @@ Les contributions sont les bienvenues ! Voici comment vous pouvez aider :
 
 **[Falous-dev](https://github.com/Falous-dev)**
 
+
+
 ### 💡 Remerciements spéciaux
 
 Merci à tous ceux qui contribuent à rendre **VirtuBot** meilleur chaque jour !
 
 ---
 
-<sub>Made with ❤️ and Python | © 2025 VirtuBot</sub>
+<sub>Made with ❤️ and Python | © 2026 VirtuBot Teams</sub>
 
 </div>

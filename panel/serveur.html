@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VirtuBot - Dashboard Serveur</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>VirtuBot</h2>
+            <span class="bot-status" id="botStatus">
+                <i class="fas fa-circle"></i> Chargement...
+            </span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-arrow-left"></i> Retour au Dashboard
+            </a>
+            <a href="#" class="nav-item active" data-page="overview">
+                <i class="fas fa-chart-bar"></i> Aperçu
+            </a>
+            <a href="#" class="nav-item" data-page="logs">
+                <i class="fas fa-file-alt"></i> Logs
+            </a>
+            <a href="#" class="nav-item" data-page="bans">
+                <i class="fas fa-hammer"></i> Bans
+            </a>
+            <a href="#" class="nav-item" data-page="members">
+                <i class="fas fa-users"></i> Membres
+            </a>
+            <a href="#" class="nav-item" data-page="blacklist">
+                <i class="fas fa-ban"></i> Blacklist
+            </a>
+            <a href="#" class="nav-item" data-page="warns">
+                <i class="fas fa-exclamation-triangle"></i> Avertissements
+            </a>
+            <a href="#" class="nav-item" data-page="tickets">
+                <i class="fas fa-ticket-alt"></i> Tickets
+            </a>
+            <a href="#" class="nav-item" data-page="settings">
+                <i class="fas fa-cog"></i> Paramètres
+            </a>
+        </nav>
+    </div>
+
+
+    <div class="main-content">
+
+        <header class="header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-center">
+                <div class="guild-header" id="guildHeader">
+                    <img src="" alt="Guild Icon" id="guildIcon"
+                        style="display: none; width: 40px; height: 40px; border-radius: 50%; margin-right: 15px;">
+                    <h2 id="guildName">Chargement...</h2>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-info" id="userInfo">
+                    <img src="" alt="User Avatar" id="userAvatar" style="display: none;">
+                    <span id="userName">Chargement...</span>
+                </div>
+                <button class="btn-logout" onclick="logout()" title="Déconnexion">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+
+        <main class="content" id="content">
+
+            <div class="page active" id="overview-page">
+                <h1>Aperçu du Serveur</h1>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="memberCount">-</h3>
+                            <p>Membres</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="channelCount">-</h3>
+                            <p>Salons</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="roleCount">-</h3>
+                            <p>Rôles</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-info-circle"></i> Informations</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Propriétaire:</span>
+                            <span class="info-value" id="guildOwner">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Région:</span>
+                            <span class="info-value" id="guildRegion">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Créé le:</span>
+                            <span class="info-value" id="guildCreated">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-user-plus"></i> Nouveaux Membres (7 derniers jours)</h3>
+                    <div class="new-members-container" id="newMembersContainer">
+                        <p class="loading">Chargement...</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-hammer"></i> Bans Récents (7 derniers jours)</h3>
+                    <div class="recent-bans-container" id="recentBansContainer">
+                        <p class="loading">Chargement...</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="page" id="logs-page">
+                <h1>Logs des Commandes</h1>
+                <div class="logs-filters">
+                    <input type="text" id="logSearch" placeholder="Rechercher..." onkeyup="filterLogs()">
+                    <select id="logTypeFilter" onchange="filterLogs()"
+                        style="padding: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color);">
+                        <option value="all">Tous les logs</option>
+                        <option value="commands">Commandes uniquement</option>
+                        <option value="errors">Erreurs uniquement</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadGuildLogs()">
+                        <i class="fas fa-sync"></i> Actualiser
+                    </button>
+                    <button class="btn btn-success" onclick="downloadGuildLogs()">
+                        <i class="fas fa-download"></i> Télécharger
+                    </button>
+                </div>
+                <div class="logs-stats"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div
+                        style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">Total
+                            Commandes</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);"
+                            id="totalCommandsCount">0</div>
+                    </div>
+                    <div
+                        style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                            Aujourd'hui</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #10B981;" id="todayCommandsCount">0
+                        </div>
+                    </div>
+                    <div
+                        style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">Erreurs
+                        </div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #EF4444;" id="errorsCount">0</div>
+                    </div>
+                    <div
+                        style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                            Utilisateurs actifs</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #F59E0B;" id="activeUsersCount">0</div>
+                    </div>
+                </div>
+                <div class="logs-container" id="logsContainer">
+                    <p class="loading">Chargement des logs...</p>
+                </div>
+            </div>
+
+
+            <div class="page" id="bans-page">
+                <h1>Gestion des Bans</h1>
+
+                <div class="ban-controls"
+                    style="margin-bottom: 2rem; background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3
+                        style="margin-bottom: 1.5rem; color: var(--primary-color); display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-user-plus"></i> Ajouter un ban
+                    </h3>
+                    <div style="display: grid; grid-template-columns: 1fr 2fr auto; gap: 1rem; align-items: end;">
+                        <div>
+                            <label
+                                style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-weight: 500;">
+                                <i class="fas fa-id-card"></i> ID de l'utilisateur
+                            </label>
+                            <input type="text" id="banUserId" placeholder="123456789012345678"
+                                style="width: 100%; padding: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; transition: all 0.3s ease;">
+                        </div>
+                        <div>
+                            <label
+                                style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-weight: 500;">
+                                <i class="fas fa-comment"></i> Raison du bannissement
+                            </label>
+                            <input type="text" id="banReason" placeholder="Spam, comportement inapproprié, etc."
+                                style="width: 100%; padding: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; transition: all 0.3s ease;">
+                        </div>
+                        <button class="btn btn-danger" onclick="addBan()"
+                            style="padding: 0.75rem 1.5rem; white-space: nowrap; height: fit-content;">
+                            <i class="fas fa-hammer"></i> Bannir
+                        </button>
+                    </div>
+                    <p
+                        style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-info-circle"></i> L'utilisateur sera immédiatement banni du serveur s'il y est
+                        présent.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: var(--primary-color); display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-list"></i> Bans actifs
+                    </h3>
+                    <button class="btn btn-primary" onclick="loadGuildBans()" style="padding: 0.5rem 1rem;">
+                        <i class="fas fa-sync"></i> Actualiser
+                    </button>
+                </div>
+                <div class="bans-container" id="bansContainer">
+                    <p class="loading">Chargement des bans...</p>
+                </div>
+            </div>
+
+
+            <div class="page" id="members-page">
+                <h1>Membres du Serveur</h1>
+                <div class="members-container" id="membersContainer">
+                    <p class="loading">Chargement des membres...</p>
+                </div>
+            </div>
+
+
+            <div class="page" id="blacklist-page">
+                <h1>Blacklist du Serveur</h1>
+                <div class="blacklist-controls"
+                    style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: flex-end;">
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">ID de
+                            l'utilisateur</label>
+                        <input type="text" id="blacklistUserId" placeholder="123456789012345678"
+                            style="width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: var(--text-primary); font-size: 1rem;">
+                    </div>
+                    <div style="flex: 2;">
+                        <label
+                            style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Raison</label>
+                        <input type="text" id="blacklistReason" placeholder="Raison du bannissement..."
+                            style="width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: var(--text-primary); font-size: 1rem;">
+                    </div>
+                    <button class="btn btn-danger" onclick="addToBlacklist()"
+                        style="padding: 0.75rem 1.5rem; white-space: nowrap;">
+                        <i class="fas fa-ban"></i> Ajouter à la blacklist
+                    </button>
+                </div>
+                <div class="blacklist-container" id="blacklistContainer">
+                    <p class="loading">Chargement de la blacklist...</p>
+                </div>
+            </div>
+
+
+            <div class="page" id="settings-page">
+                <h1>Paramètres du Serveur</h1>
+                <div class="settings-section">
+                    <div class="setting-card">
+                        <h3><i class="fas fa-cog"></i> Configuration Générale</h3>
+                        <div class="setting-item">
+                            <label>Préfixe des commandes</label>
+                            <input type="text" id="commandPrefix" placeholder="!" maxlength="5">
+                            <small>Le préfixe pour les commandes du bot (1-5 caractères)</small>
+                        </div>
+                        <div class="setting-item">
+                            <label>Langue</label>
+                            <select id="languageSetting">
+                                <option value="fr">Français</option>
+                                <option value="en">English</option>
+                                <option value="es">Español</option>
+                                <option value="de">Deutsch</option>
+                            </select>
+                            <small>Langue utilisée par le bot pour ce serveur</small>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3><i class="fas fa-bell"></i> Notifications</h3>
+                        <div class="setting-item">
+                            <label>Canal de logs</label>
+                            <select id="logChannel">
+                                <option value="">Sélectionner un canal...</option>
+                            </select>
+                            <small>Canal où seront envoyés les logs du bot</small>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3><i class="fas fa-hand-wave"></i> Message de Bienvenue</h3>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="welcomeEnabled">
+                                Activer les messages de bienvenue
+                            </label>
+                            <small>Envoie un embed "Bienvenue sur {serveur} {membre}" quand un membre rejoint</small>
+                        </div>
+                        <div class="setting-item">
+                            <label>Canal de bienvenue</label>
+                            <select id="welcomeChannel">
+                                <option value="">Sélectionner un canal...</option>
+                            </select>
+                            <small>Canal où seront envoyés les messages de bienvenue</small>
+                        </div>
+                        <div class="setting-item">
+                            <label>Auto-role</label>
+                            <select id="autoRole">
+                                <option value="">Aucun rôle automatique</option>
+                            </select>
+                            <small>Rôle attribué automatiquement aux nouveaux membres</small>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3><i class="fas fa-shield-alt"></i> Modération</h3>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="autoMod">
+                                Activer la modération automatique
+                            </label>
+                            <small>Détection automatique de spam et contenu inapproprié (fonctionnalité à venir)</small>
+                        </div>
+                        <div class="setting-item">
+                            <label>Rôle modérateur</label>
+                            <select id="modRole">
+                                <option value="">Sélectionner un rôle...</option>
+                            </select>
+                            <small>Rôle ayant accès aux commandes de modération</small>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3><i class="fas fa-save"></i> Actions</h3>
+                        <button class="btn btn-primary" onclick="saveGuildSettings()">
+                            <i class="fas fa-save"></i> Sauvegarder les paramètres
+                        </button>
+                        <button class="btn btn-danger" onclick="resetGuildSettings()" style="margin-left: 10px;">
+                            <i class="fas fa-undo"></i> Réinitialiser
+                        </button>
+                        <p id="settingsSaveStatus" style="margin-top: 1rem; opacity: 0.7;"></p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="page" id="warns-page">
+                <h1>Avertissements du Serveur</h1>
+
+                <div class="blacklist-controls"
+                    style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: flex-end;">
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">ID du
+                            membre</label>
+                        <input type="text" id="newWarnUserId" placeholder="123456789012345678"
+                            style="width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: var(--text-primary); font-size: 1rem;">
+                    </div>
+                    <div style="flex: 2;">
+                        <label
+                            style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Raison</label>
+                        <input type="text" id="newWarnReason" placeholder="Raison de l'avertissement..."
+                            style="width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: var(--text-primary); font-size: 1rem;">
+                    </div>
+                    <button class="btn btn-primary" onclick="addNewWarn()"
+                        style="padding: 0.75rem 1.5rem; white-space: nowrap;">
+                        <i class="fas fa-exclamation-triangle"></i> Avertir
+                    </button>
+                </div>
+
+                <div id="addWarnStatus" style="margin-bottom: 1rem; padding: 1rem; border-radius: 8px; display: none;">
+                </div>
+
+                <div
+                    style="background: rgba(255, 255, 255, 0.03); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h3 style="margin-top: 0;"><i class="fas fa-cogs"></i> Actions Automatiques</h3>
+                    <p style="opacity: 0.7; margin-bottom: 1rem;">Définissez les sanctions automatiques selon le nombre
+                        de warns</p>
+
+                    <button class="btn btn-success" onclick="addWarnRule()" style="margin-bottom: 1rem;">
+                        <i class="fas fa-plus"></i> Ajouter une règle
+                    </button>
+
+                    <div id="warnRulesList" style="display: grid; gap: 1rem; margin-bottom: 1rem;"></div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-primary" onclick="saveWarnConfig()">
+                            <i class="fas fa-save"></i> Sauvegarder
+                        </button>
+                        <button class="btn btn-secondary" onclick="loadWarnConfig()">
+                            <i class="fas fa-undo"></i> Annuler
+                        </button>
+                    </div>
+                    <p id="warnConfigStatus" style="margin-top: 1rem; opacity: 0.7;"></p>
+                </div>
+
+                <div class="warns-container" id="warnsList">
+                    <p class="loading">Chargement des avertissements...</p>
+                </div>
+            </div>
+
+
+            <div class="page" id="tickets-page">
+                <h1><i class="fas fa-ticket-alt"></i> Gestion des Tickets</h1>
+
+                <div class="stats-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalTickets">0</h3>
+                            <p>Total Tickets</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="openTickets">0</h3>
+                            <p>Tickets Ouverts</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="closedTickets">0</h3>
+                            <p>Tickets Fermés</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="avgResponseTime">-</h3>
+                            <p>Temps Moyen</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-section"
+                    style="background: var(--card-bg); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 2px solid var(--border-color);">
+                    <h2
+                        style="margin: 0 0 1.5rem 0; color: var(--text-color); display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-cog"></i> Configuration des Tickets
+                    </h2>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                        <div class="setting-item">
+                            <label><i class="fas fa-hashtag"></i> Canal pour créer les tickets</label>
+                            <select id="ticketChannel"
+                                style="width: 100%; padding: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color);">
+                                <option value="">Sélectionner un canal...</option>
+                            </select>
+                            <small>Canal où le bouton de création de ticket sera affiché</small>
+                        </div>
+
+                        <div class="setting-item">
+                            <label><i class="fas fa-folder"></i> Catégorie des tickets actifs</label>
+                            <select id="ticketCategory"
+                                style="width: 100%; padding: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color);">
+                                <option value="">Sélectionner une catégorie...</option>
+                            </select>
+                            <small>Catégorie où les tickets seront créés</small>
+                        </div>
+
+                        <div class="setting-item">
+                            <label><i class="fas fa-archive"></i> Catégorie d'archivage</label>
+                            <select id="archiveCategory"
+                                style="width: 100%; padding: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color);">
+                                <option value="">Sélectionner une catégorie...</option>
+                            </select>
+                            <small>Catégorie où les tickets fermés seront archivés</small>
+                        </div>
+
+                        <div class="setting-item">
+                            <label><i class="fas fa-user-shield"></i> Rôles Support</label>
+                            <select id="supportRoles" multiple
+                                style="width: 100%; padding: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); min-height: 100px;">
+                            </select>
+                            <small>Rôles ayant accès aux tickets (maintenir Ctrl pour sélectionner plusieurs)</small>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                        <button class="btn btn-primary" onclick="saveTicketConfig()">
+                            <i class="fas fa-save"></i> Sauvegarder la configuration
+                        </button>
+                        <button class="btn btn-success" onclick="sendTicketPanel()">
+                            <i class="fas fa-paper-plane"></i> Envoyer le panel de tickets
+                        </button>
+                        <button class="btn btn-warning" onclick="refreshTicketStats()">
+                            <i class="fas fa-sync"></i> Actualiser les stats
+                        </button>
+                    </div>
+                    <p id="ticketConfigStatus" style="margin-top: 1rem; color: var(--text-secondary);"></p>
+                </div>
+
+                <div class="admin-section"
+                    style="background: var(--card-bg); padding: 2rem; border-radius: 12px; border: 2px solid var(--border-color);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2
+                            style="margin: 0; color: var(--text-color); display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="fas fa-list"></i> Tickets Récents
+                        </h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select id="ticketStatusFilter" onchange="filterTickets()"
+                                style="padding: 0.5rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-color);">
+                                <option value="all">📋 Tous statuts</option>
+                                <option value="open">🔓 Ouverts</option>
+                                <option value="closed">✅ Fermés</option>
+                            </select>
+                            <select id="ticketPriorityFilter" onchange="filterTickets()"
+                                style="padding: 0.5rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-color);">
+                                <option value="all">⚡ Toutes priorités</option>
+                                <option value="urgent">🔴 Urgent</option>
+                                <option value="high">🔶 Élevé</option>
+                                <option value="normal">🟢 Normal</option>
+                                <option value="low">🔵 Faible</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="loadTicketsList()" style="padding: 0.5rem 1rem;">
+                                <i class="fas fa-sync"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="ticketsListContainer">
+                        <p class="loading">Chargement des tickets...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer
+        style="position: fixed; bottom: 0; width: 100%; background: rgba(0, 0, 0, 0.3); padding: 0.75rem; text-align: center; backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000;">
+        <p style="margin: 0; font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">
+            <strong
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">VirtuBot</strong>
+        </p>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/serveur.js"></script>
+</body>
+
+</html>

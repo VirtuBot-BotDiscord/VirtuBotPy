@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VirtuBot - Panel Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3);
+            text-align: center;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            color: white;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .admin-header p {
+            margin: 0.5rem 0 0 0;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .admin-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(88, 101, 242, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .admin-stat-card h4 {
+            margin: 0 0 1rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .admin-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 2px solid var(--border-color);
+        }
+
+        .admin-section h2 {
+            margin: 0 0 1.5rem 0;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-btn-danger {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+        }
+
+        .admin-btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+
+        .admin-btn-warning {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+        }
+
+        .admin-btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+        }
+
+        .admin-btn-success {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+        }
+
+        .admin-btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .guilds-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .guilds-table th,
+        .guilds-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .guilds-table th {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .guilds-table tr:hover {
+            background: rgba(88, 101, 242, 0.05);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10B981;
+            color: #10B981;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #EF4444;
+            color: #EF4444;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-secondary);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-color);
+            transform: translateX(-4px);
+        }
+    </style>
+</head>
+
+<body style="overflow-y: auto; height: 100vh;">
+    <div class="main-content" style="width: 100%; max-width: 1400px; margin: 0 auto; padding: 2rem; overflow-y: auto;">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Retour au panel
+        </a>
+
+        <div class="admin-header">
+            <h1>
+                <i class="fas fa-crown"></i>
+                Panel Administrateur
+            </h1>
+            <p>Accès complet aux statistiques et contrôles du bot</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="admin-stats-grid">
+            <div class="admin-stat-card">
+                <h4><i class="fas fa-server"></i> Serveurs</h4>
+                <div class="admin-stat-value" id="totalGuilds">-</div>
+                <div class="admin-stat-label">serveurs Discord</div>
+            </div>
+            <div class="admin-stat-card">
+                <h4><i class="fas fa-users"></i> Membres</h4>
+                <div class="admin-stat-value" id="totalMembers">-</div>
+                <div class="admin-stat-label">utilisateurs gérés</div>
+            </div>
+            <div class="admin-stat-card">
+                <h4><i class="fas fa-clock"></i> Uptime</h4>
+                <div class="admin-stat-value" id="uptime" style="font-size: 1.5rem;">-</div>
+                <div class="admin-stat-label">temps en ligne</div>
+            </div>
+            <div class="admin-stat-card">
+                <h4><i class="fas fa-bolt"></i> Latence</h4>
+                <div class="admin-stat-value" id="latency">-</div>
+                <div class="admin-stat-label">ms</div>
+            </div>
+            <div class="admin-stat-card">
+                <h4><i class="fas fa-hashtag"></i> Canaux</h4>
+                <div class="admin-stat-value" id="totalChannels">-</div>
+                <div class="admin-stat-label">texte + vocal</div>
+            </div>
+            <div class="admin-stat-card">
+                <h4><i class="fas fa-code"></i> Commandes</h4>
+                <div class="admin-stat-value" id="totalCommands">-</div>
+                <div class="admin-stat-label">disponibles</div>
+            </div>
+            <div class="admin-stat-card">
+                <h4><i class="fas fa-memory"></i> Mémoire</h4>
+                <div class="admin-stat-value" id="memoryUsage">-</div>
+                <div class="admin-stat-label">MB utilisés</div>
+            </div>
+            <div class="admin-stat-card">
+                <h4><i class="fas fa-chart-line"></i> Activité</h4>
+                <div class="admin-stat-value" id="commandsToday">-</div>
+                <div class="admin-stat-label">commandes aujourd'hui</div>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2><i class="fas fa-tools"></i> Actions Administrateur</h2>
+            <div class="admin-actions">
+                <button class="admin-btn admin-btn-danger" onclick="restartBot()">
+                    <i class="fas fa-sync"></i>
+                    Redémarrer le Bot
+                </button>
+                <button class="admin-btn admin-btn-warning" onclick="clearLogs()">
+                    <i class="fas fa-trash"></i>
+                    Effacer les Logs
+                </button>
+                <button class="admin-btn admin-btn-success" onclick="refreshStats()">
+                    <i class="fas fa-refresh"></i>
+                    Actualiser les Stats
+                </button>
+                <button class="admin-btn"
+                    style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); color: white;"
+                    onclick="downloadMachineLogs()">
+                    <i class="fas fa-download"></i>
+                    Télécharger Logs Machine
+                </button>
+                <button class="admin-btn"
+                    style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white;"
+                    onclick="viewMachineLogs()">
+                    <i class="fas fa-file-code"></i>
+                    Voir Logs Machine
+                </button>
+            </div>
+        </div>
+
+        <div class="admin-section" id="machineLogsSection" style="display: none;">
+            <h2><i class="fas fa-server"></i> Logs Machine</h2>
+            <div style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+                <button class="admin-btn admin-btn-success" onclick="refreshMachineLogs()">
+                    <i class="fas fa-sync"></i>
+                    Actualiser
+                </button>
+                <button class="admin-btn admin-btn-warning" onclick="clearMachineLogs()">
+                    <i class="fas fa-trash"></i>
+                    Effacer
+                </button>
+            </div>
+            <div id="machineLogsContent"
+                style="background: #1a1b1e; padding: 1.5rem; border-radius: 8px; max-height: 500px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.9rem; color: #00ff00; white-space: pre-wrap; word-wrap: break-word;">
+                Chargement...
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2><i class="fas fa-list"></i> Liste des Serveurs</h2>
+            <table class="guilds-table" id="guildsTable">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>ID</th>
+                        <th>Membres</th>
+                    </tr>
+                </thead>
+                <tbody id="guildsTableBody">
+                    <tr>
+                        <td colspan="3" style="text-align: center;">Chargement...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        let userId = null;
+
+        async function checkAuth() {
+            const token = localStorage.getItem('discord_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            try {
+                const response = await fetch('https://discord.com/api/users/@me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                const user = await response.json();
+                userId = user.id;
+
+                const adminCheck = await fetch('/api/admin/check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+
+                const adminData = await adminCheck.json();
+                if (!adminData.is_admin) {
+                    showAlert('error', 'Accès refusé. Vous n\'êtes pas administrateur.');
+                    setTimeout(() => window.location.href = 'index.html', 2000);
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Erreur auth:', error);
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+
+        async function loadAdminStats() {
+            try {
+                const response = await fetch('/api/admin/stats', {
+                    headers: { 'X-User-ID': userId }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors du chargement des stats');
+                }
+
+                const stats = await response.json();
+
+                document.getElementById('totalGuilds').textContent = stats.guilds.total;
+                document.getElementById('totalMembers').textContent = stats.members.total.toLocaleString();
+                document.getElementById('uptime').textContent = stats.uptime.formatted;
+                document.getElementById('latency').textContent = stats.latency;
+                document.getElementById('totalChannels').textContent = stats.channels.total;
+                document.getElementById('totalCommands').textContent = stats.commands.total;
+                document.getElementById('memoryUsage').textContent = stats.system.memory_mb;
+                document.getElementById('commandsToday').textContent = stats.commands.executed_today;
+
+                const tbody = document.getElementById('guildsTableBody');
+                tbody.innerHTML = '';
+
+                stats.guilds.list.forEach(guild => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${guild.name}</strong></td>
+                        <td><code>${guild.id}</code></td>
+                        <td>${guild.members.toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                showAlert('error', 'Erreur lors du chargement des statistiques');
+            }
+        }
+
+        async function restartBot() {
+            if (!confirm('Êtes-vous sûr de vouloir redémarrer le bot ?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/restart', {
+                    method: 'POST',
+                    headers: { 'X-User-ID': userId }
+                });
+
+                if (response.ok) {
+                    showAlert('success', 'Redémarrage du bot en cours...');
+                } else {
+                    showAlert('error', 'Erreur lors du redémarrage');
+                }
+            } catch (error) {
+                showAlert('error', 'Erreur: ' + error.message);
+            }
+        }
+
+        async function clearLogs() {
+            if (!confirm('Êtes-vous sûr de vouloir effacer tous les logs ?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/logs/clear', {
+                    method: 'POST',
+                    headers: { 'X-User-ID': userId }
+                });
+
+                if (response.ok) {
+                    showAlert('success', 'Logs effacés avec succès');
+                    refreshStats();
+                } else {
+                    showAlert('error', 'Erreur lors de l\'effacement des logs');
+                }
+            } catch (error) {
+                showAlert('error', 'Erreur: ' + error.message);
+            }
+        }
+
+        function refreshStats() {
+            loadAdminStats();
+            showAlert('success', 'Statistiques actualisées');
+        }
+
+        function showAlert(type, message) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isAuth = await checkAuth();
+            if (isAuth) {
+                await loadAdminStats();
+                setInterval(loadAdminStats, 5000);
+            }
+        });
+
+        async function downloadMachineLogs() {
+            try {
+                const response = await fetch('/api/admin/machine-logs', {
+                    headers: { 'X-User-ID': userId }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la récupération des logs');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `virtubot-logs-${new Date().toISOString().split('T')[0]}.log`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                showAlert('success', 'Logs téléchargés avec succès');
+            } catch (error) {
+                showAlert('error', 'Erreur: ' + error.message);
+            }
+        }
+
+        async function viewMachineLogs() {
+            const section = document.getElementById('machineLogsSection');
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                await refreshMachineLogs();
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        async function refreshMachineLogs() {
+            try {
+                const content = document.getElementById('machineLogsContent');
+                content.textContent = 'Chargement...';
+
+                const response = await fetch('/api/admin/machine-logs?format=text', {
+                    headers: { 'X-User-ID': userId }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la récupération des logs');
+                }
+
+                const logs = await response.text();
+                content.textContent = logs || 'Aucun log disponible';
+            } catch (error) {
+                document.getElementById('machineLogsContent').textContent = 'Erreur: ' + error.message;
+            }
+        }
+
+        async function clearMachineLogs() {
+            if (!confirm('Êtes-vous sûr de vouloir effacer tous les logs machine ?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/machine-logs/clear', {
+                    method: 'POST',
+                    headers: { 'X-User-ID': userId }
+                });
+
+                if (response.ok) {
+                    showAlert('success', 'Logs machine effacés avec succès');
+                    await refreshMachineLogs();
+                } else {
+                    showAlert('error', 'Erreur lors de l\'effacement des logs');
+                }
+            } catch (error) {
+                showAlert('error', 'Erreur: ' + error.message);
+            }
+        }
+    </script>
+
+    <footer
+        style="position: fixed; bottom: 0; width: 100%; background: rgba(0, 0, 0, 0.3); padding: 0.75rem; text-align: center; backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000;">
+        <p style="margin: 0; font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">
+            <strong
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">VirtuBot</strong>
+        </p>
+    </footer>
+</body>
+
+</html>

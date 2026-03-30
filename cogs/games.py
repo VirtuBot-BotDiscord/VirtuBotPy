@@ -3,6 +3,7 @@ import os
 import json
 import random
 import asyncio
+from datetime import timedelta
 from discord.ext import commands
 
 bot = None
@@ -43,7 +44,9 @@ class Games(commands.Cog):
         async def roulette_russe(interaction: discord.Interaction):
             chambre = random.randint(1, 6)
             if chambre == 1:
-                await interaction.response.send_message(f"💥 Bang! {interaction.user.mention}, vous avez perdu la roulette russe!")
+                rd_timeout = random.randint(5,60)
+                await interaction.response.send_message(f"💥 Bang! {interaction.user.mention}, vous avez perdu la roulette russe! Tu te prends donc un mute de %s minutes :)"%rd_timeout)
+                await interaction.user.timeout(timedelta(minutes=rd_timeout), reason=f"A perdu à la roulette Russe (skill issue)")
             else:
                 await interaction.response.send_message(f"😅 Click! {interaction.user.mention}, vous êtes sauf cette fois-ci!")
             print(f"{interaction.user} a joué à la roulette russe et le résultat de la chambre est {chambre}")
@@ -175,7 +178,6 @@ class Games(commands.Cog):
                 await interaction.response.send_message("❌ Vous ne pouvez pas jouer contre vous-même!", ephemeral=True)
                 return
 
-            # Vue d'acceptation du défi
             class AcceptView(discord.ui.View):
                 def __init__(self):
                     super().__init__(timeout=60)
@@ -201,14 +203,12 @@ class Games(commands.Cog):
                     self.stop()
                     await btn_interaction.response.edit_message(content=f"❌ {adversaire.mention} a refusé le défi.", view=None)
             
-            # Envoyer la demande d'acceptation
             accept_view = AcceptView()
             await interaction.response.send_message(
                 f"🔴🟡 {interaction.user.mention} défie {adversaire.mention} à une partie de Puissance 4!\n\n{adversaire.mention}, acceptez-vous le défi?",
                 view=accept_view
             )
             
-            # Attendre la réponse
             await accept_view.wait()
             
             if accept_view.accepted is None:
@@ -219,9 +219,9 @@ class Games(commands.Cog):
                 return
 
             board = [[0 for _ in range(7)] for _ in range(6)]
-            current_player = 1  # 1 = joueur1 (🔴), 2 = adversaire (🟡)
+            current_player = 1 
             game_over = False
-            last_action_time = [discord.utils.utcnow()]  # Liste pour pouvoir modifier dans les callbacks
+            last_action_time = [discord.utils.utcnow()]
             
             def display_board():
                 """Affiche le plateau de jeu"""
@@ -276,7 +276,7 @@ class Games(commands.Cog):
                     super().__init__(timeout=300)
                     self.message = None
                     
-                    # Ajout des boutons pour chaque colonne
+
                     for i in range(1, 8):
                         button = discord.ui.Button(
                             label=str(i),
@@ -286,7 +286,7 @@ class Games(commands.Cog):
                         button.callback = self.create_callback(i-1)
                         self.add_item(button)
                     
-                    # Bouton pour abandonner
+
                     quit_button = discord.ui.Button(
                         label="❌ Abandonner",
                         style=discord.ButtonStyle.danger,
@@ -313,7 +313,7 @@ class Games(commands.Cog):
                     async def callback(btn_interaction: discord.Interaction):
                         nonlocal current_player, game_over, last_action_time
                         
-                        # Mettre à jour le temps de dernière action
+
                         last_action_time[0] = discord.utils.utcnow()
                         
 
@@ -399,7 +399,7 @@ class Games(commands.Cog):
                     await btn_interaction.response.edit_message(embed=embed, view=None)
                     print(f"Puissance 4: {btn_interaction.user} a abandonné contre {winner}")
             
-            # Créer l'embed initial
+
             embed = discord.Embed(
                 title="🔴🟡 Puissance 4",
                 description=f"{display_board()}\n\n**Tour de:** {interaction.user.mention}\n🔴 {interaction.user.mention} vs 🟡 {adversaire.mention}",
@@ -416,11 +416,11 @@ class Games(commands.Cog):
         async def jeux_meme(interaction: discord.Interaction):
             """Envoie un meme aléatoire depuis le fichier meme.json"""
             try:
-                # Créer le dossier config s'il n'existe pas
+
                 if not os.path.exists('config'):
                     os.makedirs('config')
                 
-                # Créer le fichier meme.json s'il n'existe pas
+
                 if not os.path.exists('config/meme.json'):
                     default_memes = {
                         "image1": "votre_lien",

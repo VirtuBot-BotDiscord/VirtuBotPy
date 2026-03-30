@@ -5,16 +5,15 @@ class Tool(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        #Commande pour faire répéter un texte.
         @bot.tree.command(name="say", description="Fait répéter un texte")
         async def say(interaction: discord.Interaction, messages: str):
             if not interaction.user.guild_permissions.manage_messages:
                 await interaction.response.send_message("❌ Tu n'as pas la permission d'utiliser cette commande.",ephemeral=True)
             else:
                 print(f"{interaction.user} a utilisé la commande /say et a dis : {messages}")
-                await interaction.response.send_message(messages)
+                await interaction.response.send_message("L'embed a été envoyé avec succès")
+                await interaction.channel.send(messages)
 
-        #Commande pour faire répéter un texte sous forme d'embed.
         @bot.tree.command(name="sayembed", description="Fait répéter un texte sous forme d'embed configurable")
         async def sayembed(
             interaction: discord.Interaction, 
@@ -80,9 +79,10 @@ class Tool(commands.Cog):
                 embed.set_footer(text=f"Utilisé par {interaction.user}")
             
             print(f"{interaction.user} a utilisé la commande /sayembed avec le titre : {titre}")
-            await interaction.response.send_message(embed=embed)
 
-        #Commande pour créer une annonce de partenariat.
+            await interaction.response.send_message("L'embed a été envoyé avec succès", ephemeral= True)
+            await interaction.channel.send(embed=embed)
+
         @bot.tree.command(name="partenariats", description="Crée une annonce de partenariat")
         async def partenariats(
             interaction: discord.Interaction,

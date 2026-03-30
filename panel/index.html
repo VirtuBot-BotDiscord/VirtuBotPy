@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VirtuBot - Panel Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>VirtuBot</h2>
+            <span class="bot-status" id="botStatus">
+                <i class="fas fa-circle"></i> Chargement...
+            </span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="#" class="nav-item" data-page="guilds">
+                <i class="fas fa-server"></i> Serveurs
+            </a>
+            <a href="#" class="nav-item" data-page="commands">
+                <i class="fas fa-code"></i> Commandes
+            </a>
+        </nav>
+    </div>
+
+
+    <div class="main-content">
+
+        <header class="header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-right">
+                <div class="user-info" id="userInfo">
+                    <img src="" alt="User Avatar" id="userAvatar" style="display: none;">
+                    <span id="userName">Chargement...</span>
+                </div>
+                <button class="btn-logout" onclick="logout()" title="Déconnexion">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+
+        <main class="content" id="content">
+
+            <div class="page active" id="dashboard-page">
+                <h1>Dashboard</h1>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="adminGuildCount">-</h3>
+                            <p>Serveurs (propriétaire ou admin)</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-signal"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="latency">-</h3>
+                            <p>Latence (ms)</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="commandCount">-</h3>
+                            <p>Commandes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="page" id="guilds-page">
+                <h1>Serveurs</h1>
+                <div class="guilds-grid" id="guildsList">
+                    <p class="loading">Chargement des serveurs...</p>
+                </div>
+            </div>
+
+
+            <div class="page" id="commands-page">
+                <h1>Commandes</h1>
+                <div class="commands-list" id="commandsList">
+                    <p class="loading">Chargement des commandes...</p>
+                </div>
+            </div>
+
+            <div class="page" id="settings-page">
+                <h1>Paramètres</h1>
+                <div class="settings-section">
+                    <div class="setting-card">
+                        <h3>URL de l'API</h3>
+                        <input type="text" id="apiUrl" value="http://localhost:3001">
+                        <button class="btn btn-primary" onclick="saveApiUrl()">
+                            <i class="fas fa-save"></i> Sauvegarder
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer
+        style="position: fixed; bottom: 0; width: 100%; background: rgba(0, 0, 0, 0.3); padding: 0.75rem; text-align: center; backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000;">
+        <p style="margin: 0; font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">
+            <strong
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">VirtuBot</strong>
+        </p>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
