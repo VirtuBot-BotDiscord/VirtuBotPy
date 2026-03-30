@@ -1,6 +1,9 @@
 let currentGuildId = null;
 let guildData = null;
 let discordUser = null;
+let allGuildMembers = [];
+let membersCurrentPage = 1;
+const MEMBERS_PER_PAGE = 24;
 
 
 function addTokenToUrl(url) {
@@ -701,67 +704,135 @@ async function loadGuildMembers() {
     
     try {
         const members = await getGuildMembers(currentGuildId);
+        allGuildMembers = Array.isArray(members) ? members : [];
+        membersCurrentPage = 1;
         
-        if (!members || members.length === 0) {
+        if (allGuildMembers.length === 0) {
             membersContainer.innerHTML = '<p class="loading">Aucun membre trouvé</p>';
             return;
         }
-        
-        membersContainer.innerHTML = '';
-        const membersList = document.createElement('div');
-        membersList.className = 'members-list';
-        membersList.style.display = 'grid';
-        membersList.style.gridTemplateColumns = 'repeat(auto-fill, minmax(250px, 1fr))';
-        membersList.style.gap = '1rem';
-        
-        members.forEach(member => {
-            const memberName = member.username || member.name || 'Membre';
-            const memberItem = document.createElement('div');
-            memberItem.className = 'member-item';
-            memberItem.style.padding = '1rem';
-            memberItem.style.background = 'rgba(255, 255, 255, 0.05)';
-            memberItem.style.borderRadius = '8px';
-            memberItem.style.display = 'flex';
-            memberItem.style.alignItems = 'center';
-            memberItem.style.gap = '1rem';
-            memberItem.style.cursor = 'pointer';
-            memberItem.style.transition = 'all 0.2s ease';
-            
-            memberItem.onclick = () => showMemberDetails(member);
-            
-            memberItem.onmouseenter = () => {
-                memberItem.style.background = 'rgba(255, 255, 255, 0.1)';
-                memberItem.style.transform = 'scale(1.02)';
-            };
-            memberItem.onmouseleave = () => {
-                memberItem.style.background = 'rgba(255, 255, 255, 0.05)';
-                memberItem.style.transform = 'scale(1)';
-            };
-            
 
-            const CREATOR_ID = '790617995625758730';
-            const isCreator = member.id === CREATOR_ID;
-            
-            memberItem.innerHTML = `
-                <div class="member-avatar" style="width: 40px; height: 40px; border-radius: 50%; background: #5865f2; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; overflow: hidden;">
-                    ${member.avatar ? `<img src="${member.avatar}" alt="${memberName}" style="width: 100%; height: 100%; object-fit: cover;">` : memberName.charAt(0).toUpperCase()}
-                </div>
-                <div class="member-info" style="flex: 1;">
-                    <h4 style="margin: 0; font-size: 1rem;">
-                        ${memberName}
-                        ${member.bot ? ' <span style="background: #5865f2; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">BOT</span>' : ''}
-                        ${isCreator ? ' <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;" title="Créateur du bot">✨ CRÉATEUR</span>' : ''}
-                    </h4>
-                    <p style="margin: 0; font-size: 0.85rem; opacity: 0.7;">${member.discriminator ? `#${member.discriminator}` : ''}</p>
-                </div>
-            `;
-            membersList.appendChild(memberItem);
-        });
-        
-        membersContainer.appendChild(membersList);
+        renderGuildMembersPage();
     } catch (error) {
         console.error('Erreur lors du chargement des membres:', error);
         membersContainer.innerHTML = `<p class="loading">Erreur lors du chargement des membres: ${error.message}</p>`;
+    }
+}
+
+function renderGuildMembersPage() {
+    const membersContainer = document.getElementById('membersContainer');
+
+    if (!membersContainer) {
+        return;
+    }
+
+    if (!allGuildMembers || allGuildMembers.length === 0) {
+        membersContainer.innerHTML = '<p class="loading">Aucun membre trouvé</p>';
+        return;
+    }
+
+    const totalPages = Math.max(1, Math.ceil(allGuildMembers.length / MEMBERS_PER_PAGE));
+    if (membersCurrentPage > totalPages) {
+        membersCurrentPage = totalPages;
+    }
+
+    const startIndex = (membersCurrentPage - 1) * MEMBERS_PER_PAGE;
+    const endIndex = startIndex + MEMBERS_PER_PAGE;
+    const paginatedMembers = allGuildMembers.slice(startIndex, endIndex);
+
+    membersContainer.innerHTML = '';
+
+    const membersHeader = document.createElement('div');
+    membersHeader.style.display = 'flex';
+    membersHeader.style.justifyContent = 'space-between';
+    membersHeader.style.alignItems = 'center';
+    membersHeader.style.marginBottom = '1rem';
+    membersHeader.innerHTML = `
+        <div style="font-size: 0.95rem; opacity: 0.85;">
+            Affichage ${startIndex + 1}-${Math.min(endIndex, allGuildMembers.length)} sur ${allGuildMembers.length} membres
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button class="btn btn-primary" id="membersPrevPage" style="padding: 0.45rem 0.75rem;" ${membersCurrentPage === 1 ? 'disabled' : ''}>
+                <i class="fas fa-chevron-left"></i> Prec
+            </button>
+            <span style="min-width: 95px; text-align: center; font-size: 0.9rem; opacity: 0.9;">Page ${membersCurrentPage}/${totalPages}</span>
+            <button class="btn btn-primary" id="membersNextPage" style="padding: 0.45rem 0.75rem;" ${membersCurrentPage === totalPages ? 'disabled' : ''}>
+                Suiv <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    `;
+    membersContainer.appendChild(membersHeader);
+
+    const membersList = document.createElement('div');
+    membersList.className = 'members-list';
+    membersList.style.display = 'grid';
+    membersList.style.gridTemplateColumns = 'repeat(auto-fill, minmax(250px, 1fr))';
+    membersList.style.gap = '1rem';
+
+    paginatedMembers.forEach(member => {
+        const memberName = member.username || member.name || 'Membre';
+        const memberItem = document.createElement('div');
+        memberItem.className = 'member-item';
+        memberItem.style.padding = '1rem';
+        memberItem.style.background = 'rgba(255, 255, 255, 0.05)';
+        memberItem.style.borderRadius = '8px';
+        memberItem.style.display = 'flex';
+        memberItem.style.alignItems = 'center';
+        memberItem.style.gap = '1rem';
+        memberItem.style.cursor = 'pointer';
+        memberItem.style.transition = 'all 0.2s ease';
+
+        memberItem.onclick = () => showMemberDetails(member);
+
+        memberItem.onmouseenter = () => {
+            memberItem.style.background = 'rgba(255, 255, 255, 0.1)';
+            memberItem.style.transform = 'scale(1.02)';
+        };
+        memberItem.onmouseleave = () => {
+            memberItem.style.background = 'rgba(255, 255, 255, 0.05)';
+            memberItem.style.transform = 'scale(1)';
+        };
+
+        const CREATOR_ID = '790617995625758730';
+        const isCreator = member.id === CREATOR_ID;
+
+        memberItem.innerHTML = `
+            <div class="member-avatar" style="width: 40px; height: 40px; border-radius: 50%; background: #5865f2; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; overflow: hidden;">
+                ${member.avatar ? `<img src="${member.avatar}" alt="${memberName}" style="width: 100%; height: 100%; object-fit: cover;">` : memberName.charAt(0).toUpperCase()}
+            </div>
+            <div class="member-info" style="flex: 1;">
+                <h4 style="margin: 0; font-size: 1rem;">
+                    ${memberName}
+                    ${member.bot ? ' <span style="background: #5865f2; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">BOT</span>' : ''}
+                    ${isCreator ? ' <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;" title="Créateur du bot">✨ CRÉATEUR</span>' : ''}
+                </h4>
+                <p style="margin: 0; font-size: 0.85rem; opacity: 0.7;">${member.discriminator ? `#${member.discriminator}` : ''}</p>
+            </div>
+        `;
+        membersList.appendChild(memberItem);
+    });
+
+    membersContainer.appendChild(membersList);
+
+    const prevButton = document.getElementById('membersPrevPage');
+    const nextButton = document.getElementById('membersNextPage');
+
+    if (prevButton) {
+        prevButton.onclick = () => {
+            if (membersCurrentPage > 1) {
+                membersCurrentPage -= 1;
+                renderGuildMembersPage();
+            }
+        };
+    }
+
+    if (nextButton) {
+        nextButton.onclick = () => {
+            if (membersCurrentPage < totalPages) {
+                membersCurrentPage += 1;
+                renderGuildMembersPage();
+            }
+        };
     }
 }
 
