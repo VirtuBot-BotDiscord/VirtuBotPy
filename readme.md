@@ -2,6 +2,9 @@
 
 Bot Discord modulaire (Python) avec commandes slash, moderation, jeux, tickets et panel web.
 
+**Si vous cherchez la version privée, elle est disponible ici :**  
+👉 https://virtubot.falous344.fr
+
 ## Fonctionnalites principales
 
 - Moderation: kick, ban, clear, timeout, untimeout, blacklist
@@ -19,8 +22,8 @@ Bot Discord modulaire (Python) avec commandes slash, moderation, jeux, tickets e
 ## Installation rapide
 
 ```bash
-git clone https://github.com/Falous-dev/VirtuBot.git
-cd VirtuBot
+git clone https://github.com/VirtuBot-BotDiscord/VirtuBotPy.git
+cd VirtuBotPy
 pip install -r requirements.txt
 ```
 
@@ -28,41 +31,62 @@ pip install -r requirements.txt
 
 Cree un fichier .env a la racine du projet:
 
+**Voici le .env d'exemple**
+
 ```env
-# Obligatoire
-DISCORD_TOKEN=ton_token_bot
+#Exemple .env pour VirtuBotpy
 
-# Panel web / OAuth2 Discord
-DISCORD_CLIENT_ID=client_id_application_discord
-DISCORD_CLIENT_SECRET=client_secret_application_discord
-ADMIN_USER_ID=ton_user_id_discord
+# Discord bot
+DISCORD_TOKEN=
+DISCORD_CLIENT_ID=
+DISCORD_CLIENT_SECRET=
+
+
+# Admin Panel - ID Discord de l'administrateur ayant accès au panel admin
+# Pour obtenir votre ID: Paramètres Discord > Avancés > Mode développeur > Clic droit sur votre profil > Copier l'identifiant
+ADMIN_USER_ID=
+
+# Panel Web - Activer/désactiver le panel web
+# true = Panel accessible normalement
+# false = Mode maintenance (affiche page de maintenance)
 PANEL_ENABLED=true
-API_PORT=3001
 
-# Optionnel (presence bot)
+# Bot Status - Configuration du statut du bot
+# Options: online, idle, dnd (do not disturb), invisible (offline)
 BOT_STATUS=idle
-BOT_ACTIVITY_TYPE=game
-BOT_ACTIVITY=VirtuBot
-BOT_STREAMING_ENABLED=false
-BOT_STREAMING_URL=
 
-# Optionnel (logs de chargement des cogs)
-DEBUG_MODE=false
+# Bot Activity Type - Type d'activité à afficher : si vous voulez mettre le bot en mode stream, vous devez mettre BOT_ACTIVITY_TYPE sur "streaming"
+# Options: game, streaming, watching, listening
+BOT_ACTIVITY_TYPE=game
+
+# Bot Activity - Texte de l'activité à afficher
+BOT_ACTIVITY=VirtuBot | Semi open Source Bot
+
+# Bot Streaming Config - Configuration du streaming
+# true = Active le mode streaming avec URL
+# false = Désactive le streaming
+BOT_STREAMING_ENABLED=false
+
+# Streaming URL - URL Twitch/YouTube pour le streaming
+# Exemple: https://twitch.tv/votrechaine ou https://youtube.com/c/votrechannel
+BOT_STREAMING_URL=https://twitch.tv/your_channel
 ```
 
 ## Configuration du panel web (OAuth2 + Redirect URI)
 
 Dans Discord Developer Portal:
 
-1. Ouvre ton application Discord
-2. Va dans OAuth2
-3. Ajoute cette Redirect URI:
+- 1 Ouvre ton application Discord
+- 2 Va dans OAuth2
+- 3 Ajoute cette Redirect URI :
 
 ```text
 http://localhost:3001/api/auth/callback
 ```
 
-4. Sauvegarde
+**Ne pas utiliser pour la production**
+
+- 4 Sauvegarde
 
 Important:
 
