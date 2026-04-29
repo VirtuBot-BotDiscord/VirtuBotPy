@@ -31,6 +31,7 @@ pip install -r requirements.txt
 
 Cree un fichier .env a la racine du projet:
 
+
 **Voici le .env d'exemple**
 
 ```env
@@ -71,6 +72,19 @@ BOT_STREAMING_ENABLED=false
 # Exemple: https://twitch.tv/votrechaine ou https://youtube.com/c/votrechannel
 BOT_STREAMING_URL=https://twitch.tv/your_channel
 ```
+
+## Configuration du Token Discord
+
+Allez sur le Discord Developer Portal
+Créez une nouvelle application
+Allez dans l'onglet Bot
+Cliquez sur Reset Token et copiez-le
+Collez le token dans votre fichier .env
+Important : Activez les Privileged Gateway Intents :
+
+✅ Presence Intent
+✅ Server Members Intent
+✅ Message Content Intent
 
 ## Configuration du panel web (OAuth2 + Redirect URI)
 
@@ -138,6 +152,50 @@ config/             # Fichiers JSON
 requirements.txt    # Dependances Python
 ```
 
+## 🤝 Contribuer
+
+Les contributions sont les bienvenues ! Voici comment vous pouvez aider :
+
+1. **Fork** le projet
+2. Créez une **branche** pour votre fonctionnalité
+3. **Commit** vos changements 
+4. **Push** vers la branche 
+5. Ouvrez une **Pull Request**
+
+### Guidelines
+
+- Suivez le style de code existant
+- Commentez votre code en français
+- Testez vos modifications avant de soumettre
+- Mettez à jour la documentation si nécessaire
+
+
+
+## 👥 Contributeurs
+
+<div align="center">
+
+### 🌟 Créé par
+
+**[Falous-dev](https://github.com/Falous-dev)**
+
+### 👥 Contributeurs
+
+**[RomzyyTV](https://github.com/RomzyyTV)**
+**[MilanDevpy](https://github.com/MilanDevpy)**
+**[HdmDEV](https://github.com/HdmDEV)**
+
 ## Licence
 
 Voir license.md
+
+### 💡 Remerciements spéciaux
+
+Merci à tous ceux qui contribuent à rendre **VirtuBot** meilleur chaque jour !
+
+
+
+<sub>Made with ❤️ and Python | © 2026 VirtuBot Teams</sub>
+
+</div>
+
