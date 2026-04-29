@@ -8,7 +8,7 @@ Toute autre copie, miroir ou fork n’est qu’une version secondaire.
 
 ## 2. Liberté d’utilisation
 - VirtuBot est **libre de droits** pour un usage personnel, éducatif ou non commercial.
-- L’utilisation de la version privée de VirtuBot, disponible à l’adresse **https://virtubot.falous344.fr**, est explicitement autorisée.
+- L’utilisation de la version privée de VirtuBot (sans acces au code), disponible à l’adresse **https://virtubot.falous344.fr**, est explicitement autorisée.
 
 ## 3. Modification du code
 - Les utilisateurs peuvent modifier, adapter ou améliorer VirtuBot.

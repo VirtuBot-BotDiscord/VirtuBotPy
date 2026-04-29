@@ -218,6 +218,100 @@
             background: var(--primary-color);
             transform: translateX(-4px);
         }
+
+        .errors-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .error-item {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-left: 4px solid #EF4444;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .error-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+
+        .error-code {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: #FCA5A5;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.25rem 0.55rem;
+            border-radius: 6px;
+        }
+
+        .error-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+        }
+
+        .doc-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 1rem;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .doc-modal.active {
+            display: flex;
+        }
+
+        .doc-modal-content {
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .doc-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .update-banner {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+        }
+
+        .update-banner.warn {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.4);
+            color: #FBBF24;
+        }
+
+        .update-banner.ok {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #34D399;
+        }
     </style>
 </head>
 
@@ -329,6 +423,24 @@
             </div>
         </div>
 
+        <div class="admin-section" id="errorsSection">
+            <h2><i class="fas fa-exclamation-triangle"></i> Erreurs du Bot</h2>
+            <div id="updateAlert" style="display: none;"></div>
+            <div class="admin-actions" style="margin-bottom: 1rem;">
+                <button class="admin-btn admin-btn-warning" onclick="refreshErrors()">
+                    <i class="fas fa-sync"></i>
+                    Actualiser Erreurs
+                </button>
+                <button class="admin-btn" style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); color: white;" onclick="openErrorDocumentation()">
+                    <i class="fas fa-book"></i>
+                    Documentation Codes
+                </button>
+            </div>
+            <div id="errorsList" class="errors-grid">
+                <p class="loading">Chargement des erreurs...</p>
+            </div>
+        </div>
+
         <div class="admin-section">
             <h2><i class="fas fa-list"></i> Liste des Serveurs</h2>
             <table class="guilds-table" id="guildsTable">
@@ -351,6 +463,77 @@
     <script src="js/api.js"></script>
     <script>
         let userId = null;
+        let errorsInterval = null;
+
+        const ERROR_DOCUMENTATION = {
+            'ERR_PERMS': {
+                title: 'Permissions insuffisantes',
+                description: 'L\'utilisateur ou le bot n\'a pas les permissions nécessaires.',
+                solution: 'Vérifie les permissions du bot et du membre dans Discord.'
+            },
+            'ERR_ARGS': {
+                title: 'Argument manquant',
+                description: 'Une valeur obligatoire n\'a pas été fournie.',
+                solution: 'Relance la commande avec tous les paramètres requis.'
+            },
+            'ERR_CMD_NOT_FOUND': {
+                title: 'Commande introuvable',
+                description: 'La commande demandée n\'existe pas.',
+                solution: 'Utilise /help pour afficher les commandes disponibles.'
+            },
+            'ERR_COOLDOWN': {
+                title: 'Cooldown actif',
+                description: 'La commande est temporairement en attente.',
+                solution: 'Attends quelques secondes avant de recommencer.'
+            },
+            'ERR_UNKNOWN': {
+                title: 'Erreur inconnue',
+                description: 'Erreur inattendue retournée par le bot.',
+                solution: 'Consulte les logs machine pour plus de détails.'
+            },
+            'ERR_API': {
+                title: 'Erreur API',
+                description: 'Impossible de joindre une API externe.',
+                solution: 'Vérifie la connexion réseau et l\'état du service externe.'
+            },
+            'ERR_DB': {
+                title: 'Erreur données',
+                description: 'Lecture/écriture des fichiers JSON impossible.',
+                solution: 'Vérifie les fichiers dans config et leurs permissions.'
+            },
+            'ERR_TIMEOUT': {
+                title: 'Timeout',
+                description: 'Opération annulée car trop longue.',
+                solution: 'Relance l\'action et vérifie la charge serveur.'
+            },
+            'ERR_WARN_LIMIT': {
+                title: 'Limite de warns',
+                description: 'L\'utilisateur a atteint la limite configurée.',
+                solution: 'Contrôle la configuration des sanctions automatiques.'
+            },
+            'ERR_WARN_NOT_FOUND': {
+                title: 'Warn introuvable',
+                description: 'Avertissement absent ou déjà supprimé.',
+                solution: 'Vérifie l\'ID du warn demandé.'
+            },
+            'ERR_TICKET_EXISTS': {
+                title: 'Ticket déjà existant',
+                description: 'Un ticket actif existe déjà pour cet utilisateur.',
+                solution: 'Ferme le ticket actif avant d\'en créer un autre.'
+            },
+            'ERR_TICKET_CONFIG': {
+                title: 'Configuration ticket invalide',
+                description: 'La configuration tickets est absente/incomplète.',
+                solution: 'Configure les canaux, catégories et rôles tickets.'
+            }
+        };
+
+        function addTokenToUrl(url) {
+            const token = localStorage.getItem('discord_token');
+            if (!token) return url;
+            const separator = url.includes('?') ? '&' : '?';
+            return `${url}${separator}token=${encodeURIComponent(token)}`;
+        }
 
         async function checkAuth() {
             const token = localStorage.getItem('discord_token');
@@ -500,9 +683,134 @@
             const isAuth = await checkAuth();
             if (isAuth) {
                 await loadAdminStats();
+                await checkForUpdates();
+                await loadErrors();
                 setInterval(loadAdminStats, 5000);
+                errorsInterval = setInterval(loadErrors, 10000);
             }
         });
+
+        async function checkForUpdates() {
+            try {
+                const response = await fetch('/api/update/check');
+                if (!response.ok) return;
+                const data = await response.json();
+                const container = document.getElementById('updateAlert');
+                if (!container) return;
+
+                if (!data.update_available || !data.update_info) {
+                    container.style.display = 'none';
+                    container.innerHTML = '';
+                    return;
+                }
+
+                const updateInfo = data.update_info;
+                if (updateInfo.type === 'modified_version') {
+                    container.innerHTML = `
+                        <div class="update-banner warn">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Version non officielle détectée (${updateInfo.current_version}).
+                        </div>
+                    `;
+                    container.style.display = 'block';
+                    return;
+                }
+
+                if (updateInfo.type === 'update_available') {
+                    container.innerHTML = `
+                        <div class="update-banner ok">
+                            <i class="fas fa-download"></i>
+                            Mise à jour disponible: ${updateInfo.current_version} -> ${updateInfo.version}
+                            <a href="${updateInfo.url}" target="_blank" style="color: inherit; text-decoration: underline; margin-left: 0.5rem;">Voir</a>
+                        </div>
+                    `;
+                    container.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erreur update check:', error);
+            }
+        }
+
+        async function loadErrors() {
+            const container = document.getElementById('errorsList');
+            if (!container) return;
+
+            try {
+                const response = await fetch(addTokenToUrl('/api/errors'), {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('discord_token') || ''}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP ${response.status}`);
+                }
+
+                const errors = await response.json();
+
+                if (!Array.isArray(errors) || errors.length === 0) {
+                    container.innerHTML = `
+                        <div class="alert alert-success" style="margin: 0;">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Aucune erreur enregistrée.</span>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const sortedErrors = [...errors].reverse();
+                container.innerHTML = sortedErrors.map(error => `
+                    <div class="error-item">
+                        <div class="error-item-header">
+                            <span class="error-code">${error.error_code || 'ERR_UNKNOWN'}</span>
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">
+                                <i class="fas fa-clock"></i> ${new Date(error.timestamp).toLocaleString('fr-FR')}
+                            </span>
+                        </div>
+                        <div style="font-weight: 600; color: var(--text-color);">${error.error_message || 'Erreur sans message'}</div>
+                        <div class="error-meta">
+                            <div><i class="fas fa-user"></i> ${error.user || 'Inconnu'}</div>
+                            <div><i class="fas fa-server"></i> ${error.guild || 'Inconnu'}</div>
+                            ${error.command ? `<div><i class="fas fa-terminal"></i> /${error.command}</div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="alert alert-error" style="margin: 0;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Impossible de charger les erreurs: ${error.message}</span>
+                    </div>
+                `;
+            }
+        }
+
+        function refreshErrors() {
+            loadErrors();
+            showAlert('success', 'Erreurs actualisées');
+        }
+
+        function openErrorDocumentation() {
+            const modal = document.getElementById('errorDocModal');
+            const container = document.getElementById('errorDocList');
+            if (!modal || !container) return;
+
+            container.innerHTML = Object.entries(ERROR_DOCUMENTATION).map(([code, info]) => `
+                <div class="doc-item">
+                    <div style="font-family: 'Courier New', monospace; color: #FCA5A5; font-weight: 700; margin-bottom: 0.5rem;">${code}</div>
+                    <div style="font-weight: 600; margin-bottom: 0.35rem;">${info.title}</div>
+                    <div style="color: var(--text-secondary); margin-bottom: 0.5rem;">${info.description}</div>
+                    <div style="background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10B981; border-radius: 6px; padding: 0.6rem;">
+                        <strong style="color: #10B981;">Solution:</strong> ${info.solution}
+                    </div>
+                </div>
+            `).join('');
+
+            modal.classList.add('active');
+        }
+
+        function closeErrorDocumentation() {
+            const modal = document.getElementById('errorDocModal');
+            if (modal) modal.classList.remove('active');
+        }
 
         async function downloadMachineLogs() {
             try {
@@ -581,6 +889,19 @@
             }
         }
     </script>
+
+    <div class="doc-modal" id="errorDocModal" onclick="if (event.target.id === 'errorDocModal') closeErrorDocumentation();">
+        <div class="doc-modal-content">
+            <button class="admin-btn admin-btn-danger" style="position: absolute; top: 1rem; right: 1rem; padding: 0.4rem 0.75rem;" onclick="closeErrorDocumentation()">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-book"></i>
+                Documentation des codes d'erreur
+            </h2>
+            <div id="errorDocList"></div>
+        </div>
+    </div>
 
     <footer
         style="position: fixed; bottom: 0; width: 100%; background: rgba(0, 0, 0, 0.3); padding: 0.75rem; text-align: center; backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000;">

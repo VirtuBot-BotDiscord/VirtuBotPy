@@ -143,7 +143,7 @@ async def load_extensions():
     for extension in os.listdir('./cogs'):
         if extension.endswith('.py'):
             await bot.load_extension(f'cogs.{extension[:-3]}')
-            if os.getenv("DEBUG_MODE").lower() == "true":
+            if os.getenv("DEBUG_MODE", "false").lower() == "true":
                 print(f'Le module cogs.{extension[:-3]} a été chargé.')
 
 @bot.event
