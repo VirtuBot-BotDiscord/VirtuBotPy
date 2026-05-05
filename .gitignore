@@ -1,1 +1,13 @@
 .env
+/__pycache__
+/cogs/__pycache__
+config.json
+todolist.txt
+/config
+tickets_config.json
+
+tickets_data.json
+
+install.bat
+
+/api
